@@ -625,9 +625,11 @@ function selectImageFolder(fig) % selects all images in the folder
     if folder ~= 0
         fig.UserData.currentFolder = folder;
         
+        %% --- Start of changes (Added clearDetailedAnalysisTabs) ---
         % Reset all analysis results when a new folder is selected
         clearAnalysisResults(fig); 
         clearDetailedAnalysisTabs(fig); % Also clear the detailed analysis tabs
+        %% --- End of changes ---
 
         % Scan for images
         imageExtensions = {'*.jpg', '*.jpeg', '*.png', '*.bmp', '*.tiff', '*.tif'};
@@ -653,9 +655,11 @@ function loadAndProcessImages(fig) % loads and processes the selected images
     folder = fig.UserData.currentFolder;
     updateStatus(fig, {'🔄 Loading images...', ''});
     
+    %% --- Start of changes (Added clearDetailedAnalysisTabs) ---
     % Reset all analysis results when images are reloaded/processed
     clearAnalysisResults(fig); 
     clearDetailedAnalysisTabs(fig); % Also clear the detailed analysis tabs
+    %% --- End of changes ---
 
     % Find and sort images
     imageExtensions = {'*.jpg', '*.jpeg', '*.png', '*.bmp', '*.tiff', '*.tif'};
@@ -746,15 +750,19 @@ function displayImagePair(fig)
     set(findobj(fig, 'Tag', 'pairText'), 'String', sprintf('Current Pair: %d-%d', idx1, idx2)); % update text field
     updateNavigationButtons(fig);
     
+    %% --- Start of changes (Added clearDetailedAnalysisTabs) ---
     % Clear previous analysis
     clearAnalysisResults(fig); % This will now also clear the detailed analysis tabs
     clearDetailedAnalysisTabs(fig); % Also clear the detailed analysis tabs
+    %% --- End of changes ---
 end
 
 function alignCurrentImages(fig)
+    %% --- Start of changes (Added clearDetailedAnalysisTabs) ---
     % Reset all analysis results before performing new alignment
     clearAnalysisResults(fig); 
     clearDetailedAnalysisTabs(fig); % Also clear the detailed analysis tabs
+    %% --- End of changes ---
 
     % Align current image pair using SURF features
     loadedImages = fig.UserData.loadedImages;
@@ -865,19 +873,23 @@ function displayFeatureMatching(fig)
     featuresAxes = findobj(fig, 'Tag', 'featuresAxes');
     axes(featuresAxes); cla;
     
+    %% --- Start of changes (Fixed matchedPoints1 filtering) ---
     % Filter both sets of matched points by inlierIdx
     showMatchedFeatures(img1, img2, ...
                        regData.matchedPoints1(regData.inlierIdx), ...
                        regData.matchedPoints2(regData.inlierIdx), ...
                        'montage');
+    %% --- End of changes ---
     title(sprintf('Feature Matching: %d inliers of %d matches', ...
           regData.numInliers, regData.numMatches));
     drawnow; % Force redraw
 end
 
 function detectChanges(fig)
+    %% --- Start of changes (Modified clear call and added tab selection) ---
     % Clear only the detailed analysis tabs before performing new detection
     clearDetailedAnalysisTabs(fig); 
+    %% --- End of changes ---
 
     % Detect changes between aligned images
     alignedImages = fig.UserData.alignedImages;
@@ -945,6 +957,7 @@ function detectChanges(fig)
         % Display change map
         changeMapAxes = findobj(fig, 'Tag', 'changeMapAxes');
         if ~isempty(changeMapAxes) && isgraphics(changeMapAxes, 'axes')
+            %% --- Start of changes (Explicitly delete image object and set active tab) ---
             % Explicitly delete any existing image objects in the axes
             delete(findobj(changeMapAxes, 'Type', 'image')); 
             
@@ -957,6 +970,7 @@ function detectChanges(fig)
             set(analysisTabGroup, 'SelectedTab', changeTab);
             
             drawnow; % Force redraw
+            %% --- End of changes ---
         else
             updateStatus(fig, {'Error: changeMapAxes handle is invalid or not found. Cannot display change map.'});
         end
@@ -1122,6 +1136,7 @@ function clearAnalysisResults(fig)
     set(findobj(fig, 'Tag', 'reportButtonStats'), 'Enable', 'off');
 end
 
+%% --- Start of changes (New function clearDetailedAnalysisTabs) ---
 function clearDetailedAnalysisTabs(fig)
     % This function specifically clears the contents of the lower "Detailed Analysis & Comparisons" panel's tabs.
     
@@ -1132,7 +1147,7 @@ function clearDetailedAnalysisTabs(fig)
     if ~isempty(changeMapAxes) && isgraphics(changeMapAxes, 'axes')
         cla(changeMapAxes);
         text(changeMapAxes, 0.5, 0.5, 'Change map will appear here', 'HorizontalAlignment', 'center', 'Color', [0.5 0.5 0.5]);
-        drawnow; 
+        drawnow; % Force redraw after clearing
     end
 
     % Clear Feature Matching Axes
@@ -1140,7 +1155,7 @@ function clearDetailedAnalysisTabs(fig)
     if ~isempty(featuresAxes) && isgraphics(featuresAxes, 'axes')
         cla(featuresAxes);
         text(featuresAxes, 0.5, 0.5, 'Feature matches will appear here', 'HorizontalAlignment', 'center', 'Color', [0.5 0.5 0.5]);
-        drawnow; 
+        drawnow; % Force redraw after clearing
     end
     
     % Clear Statistics & Metrics Axes and Text
@@ -1148,20 +1163,21 @@ function clearDetailedAnalysisTabs(fig)
     if ~isempty(histogramAxes) && isgraphics(histogramAxes, 'axes')
         cla(histogramAxes);
         text(histogramAxes, 0.5, 0.5, 'Histogram will appear here', 'HorizontalAlignment', 'center', 'Color', [0.5 0.5 0.5]);
-        drawnow; 
+        drawnow; % Force redraw after clearing
     end
 
     scatterAxes = findobj(fig, 'Tag', 'scatterAxes');
     if ~isempty(scatterAxes) && isgraphics(scatterAxes, 'axes')
         cla(scatterAxes);
         text(scatterAxes, 0.5, 0.5, 'Scatter plot will appear here', 'HorizontalAlignment', 'center', 'Color', [0.5 0.5 0.5]);
-        drawnow; 
+        drawnow; % Force redraw after clearing
     end
 
     set(findobj(fig, 'Tag', 'detailedStatsText'), 'String', 'Detailed statistics will appear here after analysis...');
-    drawnow;
-    updateStatus(fig, {'✅ Detailed analysis tabs cleared.'});
+    drawnow; % Force redraw for text update
+    updateStatus(fig, {'✅ Detailed analysis tabs cleared.'}); % Added status update
 end
+%% --- End of changes (New function clearDetailedAnalysisTabs) ---
 
 
 %% PLACEHOLDER FUNCTIONS (to be implemented in next step)
@@ -1179,7 +1195,9 @@ end
 
 % Platzhalterfunktion für das Anwenden der Visualisierung
 function applyVisualization(fig)
+    %% --- Start of changes (Removed clearAnalysisResults, added clearDetailedAnalysisTabs) ---
     clearDetailedAnalysisTabs(fig); % Clear detailed analysis tabs before applying new visualization
+    %% --- End of changes ---
     updateStatus(fig, {'🎨 Advanced visualization features coming in Step 4!'});
 end
 % Platzhalterfunktion für das Speichern der Analyseergebnisse
