@@ -5,6 +5,10 @@ Vision Challenge SoSe 2025.
 
 1. Quick start guide
 
+Before using the application, please make sure you have the MATLAB Computer Vision 
+Toolbox, Image Processing Toolbox, and Statistics and Machine Learning 
+Toolbox installed. When run, at the start the program will print those available or missing.
+
 Follow these steps for a test tour of the application:
 - In the top-left panel named "Image Controls & Settings", click on "Select Image Folder" 
   to choose a folder with images from a same location and different dates.
