@@ -45,6 +45,8 @@ for initializing change detection.
 ● Load & Process: Loads the images from the selected folder into the 
   application. After loading, the first image pair (by default, Image 1 and Image 2) 
   will be displayed. 
+● Timelapse: Uses the functions for aligning the image and creates a Timelaps based 
+  on the image names. (Image Names define order)
 ● ◄ Prev 1 / Next 1 ►: Navigates through the image list for the first image of the 
   current pair. 
 ● ◄ Prev 2 / Next 2 ►: Navigates through the image list for the second image of 
